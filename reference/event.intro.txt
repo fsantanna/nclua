@@ -1,0 +1,338 @@
+<!--
+
+--[[
+-- TODO:
+-- * class 'edit', 'si'
+-- * event.register:
+--   1. incluir parametro `filter`
+-- * trocar register/unregister por "listeners"
+-- * especificar melhor o que é "decorrido" em uptime
+-- * handler/timer executado por vez
+-- * valor das teclas
+-- * furo na norma: set pode demorar, pra que o seq no action?
+-- * área vs ancora
+-- * set não pode ter stop?
+-- * Na norma:
+--   - selection está com ida, deveria?
+--   - selection está com volta, nao deveria
+--   - attribution tem 'area', deveria ser 'property'
+--   - attribution nao tem o transition='starts', deveria
+-- * valores associados às transições starts/stops do attribution?
+-- * imagem de exemplificacao
+-- * key.type - -> key.action
+-- * # Background: Falar do modelo orientado a eventos.
+-- * lista das teclas possíveis
+-- * usar "formatador NCL" mesmo?
+--]]
+
+-->
+
+<a name="section_visaogeral"/>
+Visão geral
+===========
+
+O modelo de execução dos NCLua's é orientado a eventos.
+Como será visto adiante, um *script* Lua para TV Digital nada mais é que um
+*tratador de eventos*.
+Existem eventos associados ao controle remoto, transmissões pelo canal de 
+interatividade, sincronismos em documentos NCL, etc, e é através deles que toda 
+dinâmica de um NCLua se faz.
+
+Durante a inicialização de um NCLua, antes de se tornar orientado a eventos,
+o *script* deve registrar pelo menos uma função de tratamento de eventos.
+A partir de então, qualquer ação tomada pela aplicação é somente em
+resposta a eventos recebidos pela função tratadora.
+O registro das funções tratadoras de eventos é feito através da função 
+[event.register](#function_register).
+
+    --- example.lua ---
+    ...                       -- código de inicialização
+    function handler (evt)
+        ...                   -- código do tratador
+    end
+    event.register(handler)   -- registro do tratador
+
+Durante a execução, um NCLua também pode enviar eventos para se comunicar com o 
+ambiente.
+Assim é possível que um NCLua envie dados pelo canal de interatividade, 
+sinalize que sua execução terminou, etc.
+A postagem de eventos é efetuada pela função [event.post](#function_post).
+
+
+Um NCLua também pode usufruir do mecanismo de eventos internamente, através de 
+eventos da classe `user`.
+Tais eventos, portanto, são postados e recebidos pelo próprio NCLua.
+
+<a name="section_classesdeeventos"/>
+Classes de Eventos
+------------------
+
+Um evento é descrito por uma tabela Lua simples, onde o campo `class` é
+obrigatório e identifica a classe do evento.
+Por exemplo, um evento para indicar que a tecla `'0'` foi pressionada é 
+descrito pela seguinte tabela:
+
+    { class='key', type='press', key='0' }
+
+As seguintes classes de eventos são definidas:
+
+<a name="class_ncl"/>
+### Classe 'ncl':
+
+Um NCLua se comunica com o documento no qual está inserido através desta classe 
+de eventos.
+
+Em um documento NCL, relacionamentos entre nós de mídia são descritos através
+de elos que relacionam condições e ações.
+Da mesma forma, um NCLua interage com o documento apenas através de elos em que 
+seu objeto de mídia está associado.
+Portanto, não é possível que um NCLua interfira diretamente no comportamento de 
+outras mídias presentes no documento.
+
+Em elos cujo papel de um NCLua seja uma *simpleAction*, a condição satisfeita 
+no elo faz com que o NCLua *receba* um evento descrevendo a ação a ser tomada.
+
+Por exemplo, no elo abaixo:
+
+    <link xconnector="onBeginStart">
+        <bind role="onBegin" component="videoId"/>
+        <bind role="start"   component="luaId"/>
+    </link>
+
+Quando `videoId` iniciar, o NCLua *'luaID'* receberá o evento:
+
+    { class='ncl', type='presentation', action='start' }
+
+Como visto, o evento será recebido pela função registrada durante a 
+inicialização do *script*.
+
+Em elos cujo papel de um NCLua seja uma *simpleCondition*, a ação do elo será 
+disparada quando o NCLua postar o evento que case com a condição esperada.
+
+Por exemplo, no elo abaixo:
+
+    <link xconnector="onBeginStart">
+        <bind role="onEnd" component="luaId"/>
+        <bind role="start" component="imageId"/>
+    </link>
+
+Assim que o NCLua postar o seguinte evento
+
+    event.post { class='ncl', type='presentation', action='stop' }
+
+O elo irá disparar a exibição da imagem que participa do elo.
+
+Há dois tipos de eventos da classe `ncl` suportados pelos NCLua: apresentação e 
+atribuição.
+Eventos de seleção são tratados pela [classe de eventos `'key'`](#class_key).
+
+O tipo é identificado no campo `type` do evento e pode assumir, portanto,
+apenas os valores `'presentation'` ou `'attribution'`.
+
+### Tipo `'presentation'`:
+
+Eventos de apresentação controlam a exibição de um nó NCLua.
+
+Eventos de apresentação podem estar associados a áreas (âncoras de 
+apresentação)
+específicas ou ao nó como um todo.
+Áreas são identificadas pelo campo `area` e equivalem ao nó inteiro
+quando ausentes (i.e. iguais a `nil`).
+
+O campo `action` indica a ação a ser tomada ou sinalizada pelo NCLua, 
+dependendo se este está recebendo ou gerando o evento.
+
+Em suma, um evento de apresentação possui a seguinte estrutura:
+
+* `class`:  `'ncl'`
+* `type`:   `'presentation'`
+* `area`:   `[string]` Nome da âncora (`label`) associada ao evento.
+* `action`: `[string]` Pode assumir os seguintes valores: `'start'`, `'stop'`, 
+`'abort'`, `'pause'` e `'resume'`.
+
+### Tipo `'attribution'`:
+
+Eventos de atribuição controlam as propriedades do nó NCLua.
+
+O campo `property` dos eventos contém o nome da propriedade em questão.
+
+Eventos de atribuição são bastante similares aos de apresentação, uma vez que 
+são regidos pelo mesmo modelo de máquina de estados.
+Assim, o campo `action` pode assumir os mesmos valores encontrados em eventos 
+de apresentação.
+
+A ação de *start* em um evento de atribuição corresponde ao `role="set"` em um 
+elo NCL.
+O campo `value` é preenchido com o valor sendo atribuido e é *sempre* uma 
+`string`, uma vez que vem de um atributo XML.
+
+As propriedades dos NCLua não possuem relação direta com variáveis declaradas 
+em *scripts*.
+Um NCLua que pretende alterar o valor de uma propriedade deve postar um evento 
+para tal fim.
+As propriedades dos nós são controladas pelo próprio documento NCL.
+
+Exemplo:
+
+    event.post {
+        class    = 'ncl',
+        type     = 'attribution',
+        property = 'myProp',
+        action   = 'start',
+        value    = '10',
+    }
+
+Em suma, um evento de atribuição possui a seguinte estrutura:
+
+* `class`:  `'ncl'`
+* `type`:   `'attribution'`
+* `property`: `[string]` Nome da propriedade (`name`) associada ao evento.
+* `action`:   `[string]` Pode assumir os seguintes valores: `'start'`, 
+  `'stop'`, `'abort'`, `'pause'` e `'resume'`.
+* `value`:    `[string]` Novo valor a ser atribuído à propriedade.
+
+<a name="class_key"/>
+## Classe 'key':
+
+Eventos da classe *key* são utilizados para detectar o uso do controle remoto 
+pelo usuário.
+Para esta classe não faz sentido que o NCLua gere eventos, uma vez que o 
+controle remoto é um dispositivo unicamente de entrada.
+
+Exemplo:
+
+    { class='key', type='press', key='0' }
+
+Eventos da classe `key` possuem a seguinte estrutura:
+
+* `class`: `'key'`
+* `type`: `[string]` Pode assumir `'press'` ou `'release'`.
+* `key`:  `[string]` Valor da tecla em questão.
+
+<a name="class_user"/>
+## Classe 'user':
+
+Aplicações podem extender sua funcionalidade criando seus próprios eventos
+através desta classe.
+
+O próprio NCLua que posta o evento o recebe em seguida, assim que outros 
+eventos pendentes seja tratados.
+
+Nenhum campo da tabela representando o evento está definido (além,
+claro, do campo `class`).
+
+Como eventos desta classe são para uso interno, não faz sentido a postagem de 
+eventos com o destino igual a `'out'`.
+
+Exemplo:
+
+    { class='user', data='mydata' }
+
+<a name="class_tcp"/>
+## Classe 'tcp':
+
+O uso do canal de interatividade é realizado por meio da classe de
+eventos *tcp*.
+
+De modo a enviar e receber dados, uma conexão deve ser pré estabelecida.
+Um evento como a seguir devee ser postado para tal fim:
+
+    event.post {
+        class = 'tcp',
+        type  = 'connect',
+        host  = <addr>,
+        port  = <number>,
+        [timeout = <number>,]
+    }
+
+O resultado da conexão é retornado em um tratador de eventos pré registrado.
+O evento retornado possui a seguinte estrutura:
+
+    evt = {
+        class      = 'tcp',
+        type       = 'connect',
+        host       = <addr>,
+        port       = <number>,
+        connection = identifier,
+        error      = <err_msg>,
+    }
+
+Os campos `error` e `connection` são mutuamente exclusivos.
+Quando houver um problema na conexão, uma mensagem de erro é retornada no campo 
+`error`.
+Quando a conexão sucede, um identificador único para a conexão é retornado no 
+campo `connection`.
+
+Um NCLua envia dados através do canal de retorno postando eventos na seguinte 
+forma:
+
+    event.post {
+        class      = 'tcp',
+        type       = 'data',
+        connection = <identifier>,
+        value      = <string>,
+        [timeout   = number,]
+    }
+
+De maneira similar, um NCLua recebe dados do canal de retorno em eventos da 
+seguinte forma:
+
+    evt = {
+        class      = 'tcp',
+        type       = 'data',
+        connection = <identifier>,
+        value      = <string>,
+        error      = <err_msg>,
+    }
+
+Novamente, os campos `error` e `connection` são mutuamente exclusivos.
+Quando houver um problema na conexão, uma mensagem de erro é retornada no campo 
+`error`.
+Quando a conexão sucede, um identificador único para a conexão é retornado no 
+campo `connection`.
+
+Para fechar uma conexão, o seguinte evento deve ser postado:
+
+    event.post {
+        class      = 'tcp',
+        type       = 'disconnect',
+        connection = <identifier>,
+    }
+
+<!--
+
+<a name="class_sms"/>
+## Classe 'sms':
+
+O compartamento de envio e recebimento por meio de SMS é muito semelhante ao
+definido na classe `'tcp'`.
+
+Um NCLua envia dados por SMS *postando* eventos.
+
+Exemplo:
+[`=[
+{ class='sms', to='2188880000', value='testando 123' }
+]=]
+
+Onde:
+* `to`: `%[string%]` Telefone de destino dos dados.
+* `value`: `%[string%]` Valor a ser enviado.
+
+De forma similar, um NCLua *recebe* dados por SMS através de eventos.
+
+Exemplo:
+[`=[
+{ class='sms', from='2188880000', value='recebido!' }
+]=]
+
+Onde:
+* `from`: `%[string%]` Telefone de origem dos dados.
+* `value`: `%[string%]` Valor sendo recebido.
+
+Também como na classe `'tcp'` o suporte à essa classe de eventos depende do
+receptor.
+
+<a name="class_edit"/>
+## Classe 'edit':
+
+-->

@@ -1,0 +1,137 @@
+<!--
+- TODO
+- Receber parametro com o numero do tutorial
+-->
+<p/>
+<html>
+<head>
+	<title>Manual de Refer&ecirc;ncia de NCLua</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<link rel="stylesheet" href="../doc.css" type="text/css"/>
+</head>
+<body>
+<p/>
+<center>
+<a href="../index.html">         In&iacute;cio</a> |
+<a href="../tutorial/index.html">Tutorial</a> |
+<a href="index.html">            Refer&ecirc;ncia</a>
+<br/>
+<b></b>Refer&ecirc;ncia:<b></b>
+<a href="event.html">event</a> |
+<a href="canvas.html">canvas</a> |
+persistent |
+settings
+</center>
+<p/>
+<hr>
+<p/>
+<center>
+<h1>Manual de Refer&ecirc;ncia de NCLua</h1>
+</center>
+<p/>
+Esta refer&ecirc;ncia &eacute; baseada na norma <b>ABNT NBR 15606-2:2007</b> relativa ao
+middleware Ginga da TV Digital Brasileira.<br/>
+Ela extrai da norma o que &eacute; referente a NCLua, basicamente a 
+especifica&ccedil;&atilde;o das novas bibliotecas adicionadas a Lua para 
+funcionar como linguagem de script de NCL.
+Al&eacute;m disso inclui mais informa&ccedil;&otilde;es e utiliza uma formata&ccedil;&atilde;o mais apropriada
+para leitura online.
+<p/>
+<h2>M&oacute;dulos:</h2>
+<p/>
+As novas bibliotecas s&atilde;o divididas em m&oacute;dulos que exportam
+um conjunto de fun&ccedil;&otilde;es de seu dom&iacute;nio.
+S&atilde;o eles: <tt>event</tt>, <tt>canvas</tt>,
+<tt>persistent</tt> e <tt>settings</tt>.
+<p/>
+<ul>
+<li><b><a href="event.html">M&oacute;dulo event</a></b>:<br/>
+  O modelo de execu&ccedil;&atilde;o de um NCLua &eacute; todo orientado a eventos.</li>
+</ul>
+<p/>
+<ul>
+<li><b><a href="canvas.html">M&oacute;dulo canvas</a></b>:<br/>
+  Um NCLua tem a possibilidade de fazer opera&ccedil;&otilde;es gr&aacute;ficas durante a
+  apresenta&ccedil;&atilde;o de uma aplica&ccedil;&atilde;o, tais como desenho de linhas, c&iacute;rculos,
+  imagens, etc.</li>
+</ul>
+<p/>
+<ul>
+<li><b>M&oacute;dulo persistent</b>: Ainda não disponível na implementação de 
+referência</li>
+</ul>
+<p/>
+<ul>
+<li><b>M&oacute;dulo settings</b>: Ainda não disponível na implementação de 
+referência</li>
+</ul>
+<p/>
+<h2>Caracter&iacute;sticas:</h2>
+<p/>
+Um fato comum entre os novos m&oacute;dulos &eacute; o de serem simplistas.
+Eles n&atilde;o tentam de forma nenhuma definir um modelo de programa&ccedil;&atilde;o ou esgotar
+em APIs todo poss&iacute;vel tipo de uso.<br/>
+O que eles oferecem de maneira geral s&atilde;o acessos a primitivas dispon&iacute;veis em
+qualquer sistema computacional.
+<p/>
+Algumas vantagens dessa abordagem:
+<ul>
+<li>N&atilde;o define uma forma amarrada de desenvolvimento de aplica&ccedil;&otilde;es que pode
+  n&atilde;o fazer sentido com a evolu&ccedil;&atilde;o do padr&atilde;o e do mercado.</li>
+<li>As novas APIs são pequenas, sucintas e de f&aacute;cil entendimento.
+  Atualmente s&atilde;o aproximadamente 30 fun&ccedil;&otilde;es ou tipos.</li>
+<li>A implementa&ccedil;&atilde;o &eacute; bastante &oacute;bvia, com um mapeamento pr&oacute;ximo de 1:1 com o
+  sistema de implementa&ccedil;&atilde;o do middleware, portanto pequena e com 
+  pouca margem
+  a comportamentos n&atilde;o padronizados.</li>
+<li>Fomenta o desenvolvimento de <i>frameworks</i>, <i>game engines</i>, etc, port&aacute;veis e
+  com utilidades diferentes sobre a mesma API.</li>
+<li>Por ter uma interface mais baixo-n&iacute;vel permite o desenvolvimento de
+  novos <i>players</i> e at&eacute; mesmo aplica&ccedil;&otilde;es nativas 
+port&aacute;veis entre <i>set-top boxes</i>.</li>
+</ul>
+<p/>
+<!--
+## Módulos:
+
+A escolha de uma
+[http://en.wikipedia.org/wiki/Dynamic_programming_language linguagem dinâmica]
+como Lua para extender
+
+Esse modelo é bastante diferente do Xlet onde o esqueleto de um programa deve
+possuir ao menos 5 métodos. Abaixo um Xlet e um script Lua "vazios", isto é,
+ambos terminam imediatamente sem nem mesmo escrever um "Hello World!".
+
+=== example.lua ===
+=== fim ===
+
+=== Example.java ===
+public class Example implements javax.tv.xlet.Xlet {
+  private javax.tv.xlet.XletContext context;
+  public Example() { }
+  public void initXlet(javax.tv.xlet.XletContext context)
+                  throws javax.tv.xlet.XletStateChangeException { }
+  public void startXlet()
+                  throws javax.tv.xlet.XletStateChangeException { }
+  public void pauseXlet() { }
+  public void destroyXlet(boolean unconditional)
+                  throws javax.tv.xlet.XletStateChangeException { }
+}
+-->
+<p/>
+<hr>
+<p/>
+<center>
+<b></b>Refer&ecirc;ncia:<b></b>
+<a href="event.html">event</a> |
+<a href="canvas.html">canvas</a> |
+persistent |
+settings
+<br/>
+<a href="../index.html">         In&iacute;cio    </a> |
+<a href="../tutorial/index.html">Tutorial  </a> |
+<a href="index.html">            Refer&ecirc;ncia</a>
+</center>
+<p/>
+</body>
+</html>

@@ -1,0 +1,536 @@
+<a name="section_funcoes"/>
+Funções
+=======
+
+<table border="0" width="95%">
+
+<tr>
+<td><code><big><strong>
+<a href="#function_new">canvas:new (...)</a>
+</strong></big></code>
+<br/>
+A partir do objeto `canvas` é possível criar novos objetos gráficos e combiná-los através de operações de composição.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_attrSize">canvas:attrSize ()</a>
+</strong></big></code>
+<br/>
+Retorna as dimensões do canvas.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_attrColor">canvas:attrColor (...)</a>
+</strong></big></code>
+<br/>
+Acessa o atributo de cor do canvas.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_attrClip">canvas:attrClip (...)</a>
+</strong></big></code>
+<br/>
+Acessa o atributo que limita a área do canvas para desenho.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_attrCrop">canvas:attrCrop (...)</a>
+</strong></big></code>
+<br/>
+Acessa o atributo de recorte do canvas.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_attrFont">canvas:attrFont (...)</a>
+</strong></big></code>
+<br/>
+Acessa o atributo de fonte do canvas.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_drawLine">canvas:drawLine (x1, y1, x2, y2)</a>
+</strong></big></code>
+<br/>
+Desenha uma linha com extremidades em `(x1,y1)` e `(x2,y2)`.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_drawRect">canvas:drawRect (mode, x, y, width, height)</a>
+</strong></big></code>
+<br/>
+Desenha um retângulo no canvas.
+</tr>
+
+<!--
+<tr>
+<td><code><big><strong>
+<a href="#function_drawPolygon">canvas:drawPolygon (mode)</a>
+</strong></big></code>
+<br/>
+Desenha um polígono no canvas.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_drawEllipse">canvas:drawEllipse (mode, xc, yc, width, height, ang_start, ang_end)</a>
+</strong></big></code>
+<br/>
+Desenha elipses e outras primitivas similares tais como círculos, arcos e setores.
+</tr>
+-->
+
+<tr>
+<td><code><big><strong>
+<a href="#function_drawText">canvas:drawText (x, y, text)</a>
+</strong></big></code>
+<br/>
+Desenha o texto passado na posição (x,y) do canvas.
+</tr>
+
+<!--
+<tr>
+<td><code><big><strong>
+<a href="#function_pixel">canvas:pixel (x, y, ...)</a>
+</strong></big></code>
+<br/>
+Lê ou altera a cor de um pixel do canvas.
+</tr>
+-->
+
+<tr>
+<td><code><big><strong>
+<a href="#function_measureText">canvas:measureText (text)</a>
+</strong></big></code>
+<br/>
+Retorna as dimensões do texto passado.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_compose">canvas:compose (x, y, canvas, src_x, src_y, src_width, src_height)</a>
+</strong></big></code>
+<br/>
+Faz a composição pixel a pixel entre dois canvas.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_flush">canvas:flush ()</a>
+</strong></big></code>
+<br/>
+Atualiza o canvas após operações de desenho e de composição.
+</tr>
+
+</table>
+
+<hr/>
+
+<a name="function_new"/>
+<big>
+    canvas:new (...)
+</big>
+
+A partir do objeto `canvas` é possível criar novos objetos gráficos e combiná-los através de operações de composição.
+
+Há dois tipos de construtores.
+
+O primeiro instancia um canvas com o tamanho especificado:
+
+    canvas:new (width, height)
+
+Onde:
+
+* `width`: `[number]` Largura do canvas.
+* `height`: `[number]` Altura do canvas.
+
+Inicialmente os pixels são todos transparentes.
+
+O segundo instancia um canvas cujo conteúdo é a imagem passada como parâmetro:
+
+    canvas:new (image_path)
+
+Onde:
+
+* `image_path`: `[string]` Caminho da imagem.
+
+O novo canvas mantém os aspectos de transparência da imagem original.
+
+<hr/>
+
+<a name="function_attrSize"/>
+<big>
+    canvas:attrSize ()
+</big>
+
+Retorna as dimensões do canvas.
+
+Retorna:
+
+* `width`:  `[number]` Largura do canvas.
+* `height`: `[number]` Altura do canvas.
+
+Não é possível alterar as dimensões de um canvas instanciado, portanto
+para este método, apenas a leitura é disponível.
+
+<hr/>
+
+<a name="function_attrColor"/>
+<big>
+    canvas:attrColor (...)
+</big>
+
+Acessa o atributo de cor do canvas.
+
+As primitivas gráficas utilizam a cor deste atributo do canvas.
+As cores são descritas em `RGBA`, onde `A` varia de 0 (totalmente
+transparente) a 255 (totalmente opaco).
+O valor inicial do atributo é `0,0,0,255` (preto).
+
+Os valores de retorno (em caso de *leitura*) e argumentos (em caso de
+*escrita*), são:
+
+* `R`: `[number]` Componente vermelha da cor.
+* `G`: `[number]` Componente verde da cor.
+* `B`: `[number]` Componente azul da cor.
+* `A`: `[number]` Componente alpha da cor.
+
+A assinatura do método para *leitura* é:
+
+    canvas:attrColor () --> R, G, B, A
+
+A assinatura do método para *escrita* é:
+
+    canvas:attrColor (R, G, B, A)
+
+Também é possível passar diretamente o nome da cor:
+
+    canvas:attrColor (color_name, A)
+
+Onde:
+
+* `color_name`: `[string]` Nome da cor.
+* `A`: `[number]` Componente alpha da cor.
+
+Uma das 16 cores NCL pré-definidas pode ser passada:
+
+    'white', 'aqua', 'lime', 'yellow', 'red',   'fuchsia', 'purple', 'maroon',
+    'blue',  'navy', 'teal', 'green',  'olive', 'silver',  'gray',   'black'
+
+Em ambos os casos, caso `A` não seja passado, é assumido o valor 255 (opaco).
+
+<!-- CANVAS:ATTRCLIP() -->
+
+<hr/>
+
+<a name="function_attrClip"/>
+<big>
+    canvas:attrClip (...)
+</big>
+
+Acessa o atributo que limita a área do canvas para desenho.
+
+As primitivas de desenho e o método [compose](#function_compose) só operam
+dentro da região limitada.
+
+O valor inicial é o canvas inteiro.
+
+Os valores de retorno (em caso de *leitura*) e argumentos (em caso de
+*escrita*), são:
+
+* `x`:      `[number]` Coordenada `x` da área limitada.
+* `y`:      `[number]` Coordenada `y` da área limitada.
+* `width`:  `[number]` Largura da área limitada.
+* `height`: `[number]` Altura da área limitada.
+
+A assinatura do método para *leitura* é:
+
+    canvas:attrClip () --> x, y, width, height
+
+A assinatura do método para *escrita* é:
+
+    canvas:attrClip (x, y, width, height)
+
+<!-- CANVAS:ATTRCROP() -->
+
+<hr/>
+
+<a name="function_attrCrop"/>
+<big>
+    canvas:attrCrop (...)
+</big>
+
+Acessa o atributo de recorte do canvas.
+
+Quando o canvas é composto sobre outro, apenas a região de recorte é copiada 
+para o canvas de destino.
+
+O valor inicial é o canvas inteiro.
+
+Os valores de retorno (em caso de *leitura*) e argumentos (em caso de
+*escrita*), são:
+
+* `x`:      `[number]` Coordenada `x` da área limitada.
+* `y`:      `[number]` Coordenada `y` da área limitada.
+* `width`:  `[number]` Largura da área limitada.
+* `height`: `[number]` Altura da área limitada.
+
+A assinatura do método para *leitura* é:
+
+    canvas:attrCrop () --> x, y, width, height
+
+A assinatura do método para *escrita* é:
+
+    canvas:attrCrop (x, y, width, height)
+
+<!-- CANVAS:ATTRFONT() -->
+
+<hr/>
+
+<a name="function_attrFont"/>
+<big>
+    canvas:attrFont (...)
+</big>
+
+Acessa o atributo de fonte do canvas.
+
+<!--
+ As seguintes fontes estão disponíveis: `'Times', 'Courier' e 'Helvetica'`.  
+-->
+
+O tamanho é em pixels e representa a altura máxima de uma linha escrita com
+a fonte escolhida.
+Os estilos possíveis são: 'bold', 'italic' ou 'bold-italic'. O valor `nil`
+assume que nenhum dos estilos será usado.
+Qualquer valor passado não suportado deve obrigatoriamente gerar um erro.
+O valor inicial da fonte é indeterminado.
+
+Os valores de retorno (em caso de *leitura*) e argumentos (em caso de
+*escrita*), são:
+
+* `face`:  `[string]` Nome da fonte.
+* `size`:  `[number]` Tamanho da fonte.
+* `style`: `[string]` Estilo da fonte.
+
+A assinatura do método para *leitura* é:
+
+    canvas:attrFont () --> face, size, style
+
+A assinatura do método para *escrita* é:
+
+    canvas:attrFont (face, size, style)
+
+<hr/>
+
+<a name="function_drawLine"/>
+<big>
+    canvas:drawLine (x1, y1, x2, y2)
+</big>
+
+Desenha uma linha com extremidades em `(x1,y1)` e `(x2,y2)`.
+
+Utiliza a cor especificada em [attrColor](#function_attrColor).
+
+Recebe:
+
+* `x1`: `[number]` Extremidade 1 da linha.
+* `y1`: `[number]` Extremidade 1 da linha.
+* `x2`: `[number]` Extremidade 2 da linha.
+* `y2`: `[number]` Extremidade 2 da linha.
+
+<hr/>
+
+<a name="function_drawRect"/>
+<big>
+    canvas:drawRect (mode, x, y, width, height)
+</big>
+
+Desenha um retângulo no canvas.
+
+Utiliza a cor especificada em [attrColor](#function_attrColor).
+
+Recebe:
+
+* `mode`:   `[string]` Modo de desenho: `'frame'` ou `'fill'`.
+* `x`:      `[number]` Coordenada do retângulo.
+* `y`:      `[number]` Coordenada do retângulo.
+* `width`:  `[number]` Largura do retângulo.
+* `height`: `[number]` Altura do retângulo.
+
+O parâmetro `mode` pode receber `'frame'` para desenhar apenas a moldura do
+retângulo ou `'fill'` para preenchê-lo.
+
+<!--
+
+<hr/>
+
+<a name="function_drawPolygon"/>
+<big>
+    canvas:drawPolygon (mode)
+</big>
+
+Desenha um polígono no canvas.
+
+Utiliza a cor especificada em [attrColor](#function_attrColor).
+
+Recebe:
+
+* `mode`: `[string]` Modo de desenho: `'open'`, `'close'` ou `'fill'`.
+
+O parâmetro `mode` recebe `'open'` para desenhar o polígono sem ligar o
+último ponto ao primeiro; `'close'` para ligá-los; ou `'fill'` para
+preenchê-lo.
+
+Retorna:
+
+* `nextVertex`: `[function]` Função de adição de vértices.
+A função possui a assinatura:
+
+    function (x, y) end ==> nextVertex
+
+Recebendo as coordenadas do próximo vértice do polígono e se retornando,
+facilitando a composição:
+
+    canvas:polygon('fill')(1,1)(10,1)(10,10)(1,10)()
+
+Ao receber `nil`, a função `nextVertex` efetua a operação encadeada e
+qualquer chamada subsequente gera um erro.
+
+<hr/>
+
+<a name="draw_ellipse"/>
+<big>
+    canvas:drawEllipse (mode, xc, yc, width, height, ang_start, ang_end)
+</big>
+
+Desenha elipses e outras primitivas similares tais como círculos, arcos
+e setores.
+
+Utiliza a cor especificada em [attrColor](#function_attrColor).
+
+Recebe:
+
+* `mode`:      `[string]` Modo de desenho: `'arc'` ou `'fill'`.
+* `xc`:        `[number]` Centro da elipse.
+* `yc`:        `[number]` Centro da elipse.
+* `width`:     `[number]` Largura da elipse.
+* `height`:    `[number]` Altura da elipse.
+* `ang_start`: `[number]` Ângulo de início da elipse.
+* `ang_end`:   `[number]` Ângulo de fim da elipse.
+
+O parâmetro `mode` pode receber `'arc'` para desenhar apenas a
+circunferência ou 'fill' para preenchimento interno da elipse.
+
+Os ângulos são dados em graus.
+
+-->
+
+<hr/>
+
+<a name="function_drawText"/>
+<big>
+    canvas:drawText (x, y, text) end
+</big>
+
+Desenha o texto passado na posição (x,y) do canvas.
+
+Utiliza a cor especificada em [attrColor](#function_attrColor) e
+fonte em [attrFont](#function_attrFont).
+
+Recebe:
+
+* `x`:    `[number]` Coordenada `x` do texto.
+* `y`:    `[number]` Coordenada `y` do texto.
+* `text`: `[string]` Texto a ser desenhado.
+
+<!--
+
+<hr/>
+
+<a name="function_pixel"/>
+<big>
+    canvas:pixel (x, y, ...) end
+</big>
+
+Lê ou altera a cor de um pixel do canvas.
+
+Tanto para *leitura* quanto para *escrita*, a função recebe os argumentos:
+
+* `x`: `[number]` Posição `x` do pixel.
+* `y`: `[number]` Posição `y` do pixel.
+
+Os valores de retorno (em caso de *leitura*) e demais argumentos (em caso de
+*escrita*), são:
+
+* `R`: `[number]` Componente vermelha da cor.
+* `G`: `[number]` Componente verde da cor. 
+* `B`: `[number]` Componente azul da cor.
+* `A`: `[number]` Componente alpha da cor.
+
+A assinatura do método para *leitura* é:
+
+    canvas:pixel (x, y) --> R, G, B, A
+
+A assinatura do método para *escrita* é:
+
+    canvas:pixel (x, y, R, G, B, A)
+
+-->
+
+<hr/>
+
+<a name="function_measureText"/>
+<big>
+    canvas:measureText (text)
+</big>
+
+Retorna as dimensões do texto passado.
+
+Utiliza a fonte especificada em [attrFont](#function_attrFont).
+
+Recebe:
+
+* `texto`: `[string]` Texto a ser medido.
+
+Retorna:
+
+* `dx`: `[number]` Largura do texto.
+* `dy`: `[number]` Altura do texto.
+
+<hr/>
+
+<a name="function_compose"/>
+<big>
+    canvas:compose (x, y, canvas_src)
+</big>
+
+Faz a composição pixel a pixel entre dois canvas.
+
+O canvas passado como `src` é desenhado sobre o canvas em uso (`canvas`) na
+posição passada.
+
+Recebe:
+
+* `x`:          `[number]` Posição `x` da composição.
+* `y`:          `[number]` Posição `y` da composição.
+* `canvas_src`: `[canvas]` Canvas a ser composto sobre `canvas`.
+
+Após a operação, o canvas de destino `canvas` possui o resultado da composição
+e o canvas `src` não sofre qualquer alteração.
+
+<hr/>
+
+<a name="function_flush"/>
+<big>
+    canvas:flush ()
+</big>
+
+Atualiza o canvas após operações de desenho e de composição.
+
+É suficiente chamá-la apenas uma vez após uma sequência de operações.

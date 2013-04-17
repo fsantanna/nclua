@@ -1,0 +1,72 @@
+<!--
+
+TODO:
+* attrText()
+    - fonte faces
+* attrFlip()
+* attrOpacity()
+* attrRotation()
+* attrScale()
+* clear()
+* imagem do exemplo
+* attrColor (self, color_name, A)
+* Os ângulos são dados em graus.
+* drawPolygon: imgs explicando 'open', close e o drawer()()
+
+-->
+
+<a name="section_visaogeral"/>
+# Visão Geral
+
+Um NCLua tem a possibilidade de fazer operações gráficas durante a
+apresentação de uma aplicação, tais como desenho de linhas, círculos,
+imagens, etc.
+
+Quando um NCLua é iniciado, automaticamente é instanciado um objeto gráfico
+que é atribuido à variável global `canvas`. Este objeto aponta para a região
+associada ao nó de mídia NCLua no documento NCL e é através dele que todas
+as operações gráficas são feitas.
+
+Caso o nó de mídia NCLua não esteja associado a nenhuma região, então o
+valor de `canvas` será igual a `nil`.
+
+Se a região associada for, por exemplo:
+
+    <region id="luaRegion" width="300" height="100" top="200" left="20"/>
+
+a variável `canvas` do NCLua correspondente estará associada à região
+`luaRegion` de tamanho 300x100 e localizada na posição (20,200).
+
+Além das primitivas gráficas já mencionadas, também é possível instanciar
+novos canvas, através de um construtor `canvas:new(...)`, e assim
+representar outros objetos gráficos (*layers*) que podem, então, ser
+compostos.
+
+Um objeto `canvas` guarda em seu estado atributos sob os quais as primitivas
+gráficas operam, por exemplo, se seu atributo de cor for azul, uma chamada a
+`canvas:drawLine(...)` desenhará uma linha azul no canvas.
+Os atributos são acessados através dos métodos de prefixo `attr` e sufixo do
+nome do atributo (e.g. `attrColor`) que servem tanto para leitura como para
+escrita (*getter e setter*).
+
+Repare que o primeiro parâmetro de todos os métodos do módulo é sempre
+`self`, isto é, a referência para o canvas em questão.
+Portanto, é recomendado o uso de *chamada de método de Lua* utilizando o
+`:` (*colon operator*) como em:
+
+    myCanvas:drawRect('fill', 10, 10, 100, 100)
+
+As coordenadas passadas para os métodos são sempre relativas ao ponto mais à
+esquerda e ao topo do canvas `(0,0)`, como é comum entre sistemas gráficos.
+
+Segue um exemplo simples para ilustrar o uso do módulo canvas:
+
+    width, height = canvas:attrSize()   -- pega as dimensões da região
+    canvas:drawLine(0,0, width,height)  -- desenha uma linha cruzando o canvas
+    img = canvas:new('image.png')       -- carrega 'image.png' para um novo canvas
+    canvas:compose(100, 100, img)       -- desenha a imagem na posição (100,100) da região
+    canvas:flush()                      -- atualiza a região do documento NCL
+
+O resultado visual é o seguinte:
+
+<img src="TODO.PNG"/>

@@ -1,0 +1,157 @@
+<a name="section_funcoes"/>
+Funções
+=======
+
+<table border="0" width="95%">
+
+<tr>
+<td><code><big><strong>
+<a href="#function_register">event.register ([pos,] f)</a>
+</strong></big></code>
+<br/>
+Registra a função passada como um tratador de eventos, isto é, sempre que 
+ocorrer um evento, `f` será chamada.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_unregister">event.unregister (f)</a>
+</strong></big></code>
+<br/>
+Desregistra a função passada como um tratador de eventos, isto é, novos eventos 
+não serão mais passados a `f`.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_post">event.post ([dst,] evt)</a>
+</strong></big></code>
+<br/>
+Posta o evento passado.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_timer">event.timer (time, f)</a>
+</strong></big></code>
+<br/>
+Cria um timer que expira após `time` (em milisegundos) e então chama a função 
+`f`.
+</tr>
+
+<tr>
+<td><code><big><strong>
+<a href="#function_uptime">event.uptime ()</a>
+</strong></big></code>
+<br/>
+Retorna o número de milisegundos decorridos desde o início da aplicação.
+</tr>
+
+</table>
+
+<hr/>
+
+<a name="function_register"/>
+<big>
+    `event.register ([pos,] f)`
+</big>
+
+<!-- TODO: incluir parametro `filter` -->
+
+Recebe:
+
+* `pos`: [number]   Posição de inserção da função de tratamento.
+* `f`:   [function] Função de tratamento.
+
+A assinatura de `f` deve ser:
+
+    function f (evt)
+        -- returns boolean
+    end
+
+Onde `evt` é o evento que, ao ocorrer, ativa a função.
+A função pode retornar `true`, para sinalizar que o evento foi tratado e,
+portanto, não deve ser enviado a outros tratadores.
+
+É recomendado que a função (definida pela aplicação) retorne rapidamente,
+já que enquanto ela estiver executando, nenhum outro evento é processado.
+
+O formatador NCL garante que as funções recebem os eventos na ordem em que
+foram registradas. Enquanto os tratadores não retornam o valor `true`, o
+formatador notifica o próximo tratador registrado.
+
+O parâmetro `pos` é opcional e, caso não seja passado, a função registrada será 
+a última a receber eventos.
+
+<hr/>
+
+<a name="function_unregister"/>
+<big>
+    `event.unregister (f)`
+</big>
+
+Desregistra a função passada como um tratador de eventos, isto é, novos
+eventos não serão mais passados a `f`.
+
+Recebe:
+
+* `f`: [function] Função de tratamento.
+
+Posta o evento passado.
+
+<hr/>
+
+<a name="function_post"/>
+<big>
+    `event.post ([dst,] evt)`
+</big>
+
+Recebe:
+
+* `dst`: [string] Destinatário do evento.
+         Pode assumir os valores `'in'` (envio para a própria aplicação) e
+         `'out'` (envio para o formatador NCL).
+         Caso seja omitido, assume o valor `'out'`.
+* `evt`: [table] Evento a ser postado.
+
+Retorna:
+
+* `sent`: [boolean] Se o evento foi enviado com sucesso.
+* `err_msg`: [string] Mensagem em caso de erro.
+
+<hr/>
+
+<a name="function_timer"/>
+<big>
+    `event.timer (time, f)`
+</big>
+
+Cria um timer que expira após `time` (em milisegundos) e então chama a
+função `f`.
+
+Recebe:
+
+* `time`: [number] Tempo em milisegundos.
+* `f`: [function] Função de retomada.
+
+Retorna:
+
+* `unreg`: [function] Função que, quando chamada, cancela o timer.
+
+A assinatura de f é simples, sem parâmetros:
+
+    function f () end
+
+O valor de `0` milisegundos é válido. Neste caso, `f` é chamada assim que
+possível (nunca imediatamente, dentro de um tratador de eventos).
+Assim como tratadores de eventos, a função `f` deve retornar rapidamente,
+pois enquanto ela é executada nenhum evento é tratado.
+
+<hr/>
+
+<a name="function_uptime"/>
+<big>
+    `event.uptime ()`
+</big>
+
+Retorna o número de milisegundos decorridos desde o início da aplicação.
