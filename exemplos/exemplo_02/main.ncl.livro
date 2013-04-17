@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ncl id="nclClicks" xmlns="http://www.ncl.org.br/NCL3.0/EDTVProfile">
+
+<head>
+
+<!-- TODO: explicitDur -->
+
+<regionBase>
+    <region width="20%" height="20%" left="40%" top="40%" id="rgButton"/>
+</regionBase>
+
+<descriptorBase>
+    <descriptor id="dsButton" region="rgButton" focusIndex="0"/>
+</descriptorBase>
+
+<connectorBase>
+	<causalConnector id="onBeginStart">
+		<simpleCondition role="onBegin"/>
+		<simpleAction role="start"/>
+	</causalConnector>
+
+	<causalConnector id="onEndStop">
+		<simpleCondition role="onEnd"/>
+		<simpleAction role="stop" max="unbounded"/>
+	</causalConnector>
+
+	<causalConnector id="onSelectionStopSet">
+		<simpleCondition role="onSelection"/>
+		<connectorParam name="var"/>
+		<compoundAction operator="seq">
+			<simpleAction role="stop"/>
+			<simpleAction role="set" value="$var"/>
+		</compoundAction>
+	</causalConnector>
+
+	<causalConnector id="onCondGteBeginStart">
+		<connectorParam name="var"/>
+		<compoundCondition operator="and">
+			<simpleCondition role="onBegin" />
+			<assessmentStatement comparator="gte">
+				<attributeAssessment role="attNodeTest" eventType="attribution" attributeType="nodeProperty"/>
+				<valueAssessment value="$var"/>
+			</assessmentStatement>
+		</compoundCondition>
+		<simpleAction role="start"/>
+	</causalConnector>
+
+	<causalConnector id="onCondLtBeginStart">
+		<connectorParam name="var"/>
+		<compoundCondition operator="and">
+			<simpleCondition role="onBegin" />
+			<assessmentStatement comparator="lt">
+				<attributeAssessment role="attNodeTest" eventType="attribution" attributeType="nodeProperty"/>
+				<valueAssessment value="$var"/>
+			</assessmentStatement>
+		</compoundCondition>
+		<simpleAction role="start"/>
+	</causalConnector>
+</connectorBase>
+
+</head>
+
+<body>
+    <!-- INICIO PELO TIMER -->
+    <port id="entryPoint" component="timer"/>
+
+    <!-- TIMER -->
+    <media id="timer" explicitDur="4s">
+        <!-- ANCORAS PARA EXIBICAO DO BOTAO "CLIQUE AQUI" -->
+        <area id="area01" begin="3s"  end="6s"/>
+		<area id="area02" begin="10s" end="13s"/>
+		<area id="area03" begin="17s" end="20s"/>
+		<area id="area04" begin="24s" end="27s"/>
+        <!-- ANCORA PARA EXIBIR O RESULTADO -->
+        <area id="resultado" begin="35s"/>
+	</media>
+
+    <!-- NCLua -->
+	<media id="clicks" src="clicks.lua">
+        <area name="inc"/>
+        <property name="counter"/>
+	</media>
+	
+    <!-- BOTOES "CLIQUE AQUI" / "VOCE GANHOU" / "VOCE PERDEU" -->
+    <media id="aqui"   descriptor="dsButton" src="media/aqui.jpg"/>
+    <media id="ganhou" descriptor="dsButton" src="media/ganhou.jpg"/>
+    <media id="perdeu" descriptor="dsButton" src="media/perdeu.jpg"/>
+
+    <!-- TIMER -> NCLua -->
+	<link xconnector="onBeginStart">
+        <bind role="onBegin" component="timer"/>
+        <bind role="start"   component="clicks"/>
+	</link>
+
+    <!-- AREA[N] -> BOTAO "CLIQUE AQUI" -->
+	<link xconnector="onBeginStart">
+        <bind role="onBegin" component="timer" interface="area01"/>
+        <bind role="start" component="aqui"/>
+	</link>
+    ...
+
+    <link xconnector="onEndStop">
+        <bind role="onEnd" component="timer" interface="area01"/>
+        <bind role="stop" component="aqui"/>
+	</link>
+    ...
+
+    <!-- SELECT "CLIQUE AQUI" -> CLICKS.INC -->
+    <link xconnector="onSelectionStopSet">
+        <bind role="onSelection" component="aqui"/>
+        <bind role="stop"        component="aqui"/>
+        <bind role="start"       component="clicks" interface="inc"/>
+    </link>
+
+    <!-- TESTE DO RESULTADO -->
+    <link xconnector="onCondGteBeginStart">
+		<linkParam name="var" value="3"/>
+        <bind role="onBegin" component="timer" interface="resultado"/>
+		<bind role="attNodeTest" component="clicks" interface="counter"/>
+		<bind role="start" component="win"/>
+	</link>
+	<link xconnector="onCondLtBeginStart">
+		<linkParam name="var" value="3"/>
+        <bind role="onBegin" component="timer" interface="resultado"/>
+		<bind role="attNodeTest" component="clicks" interface="counter"/>
+		<bind role="start" component="lose"/>
+	</link>
+</body>
+
+</ncl>
